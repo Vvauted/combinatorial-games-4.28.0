@@ -67,6 +67,23 @@ theorem Set.exists_insert {x : α} {y : Set α} :
 @[game_cmp] theorem forall_lt_one {P : ℕ → Prop} : (∀ n < 1, P n) ↔ P 0 := by simp
 @[game_cmp] theorem exists_lt_one {P : ℕ → Prop} : (∃ n < 1, P n) ↔ P 0 := by simp
 
+namespace Nat
+
+/-- Compatibility lemma present in newer versions of Lean/mathlib. -/
+@[game_cmp] theorem exists_lt_succ {P : ℕ → Prop} {n : ℕ} :
+    (∃ m < n + 1, P m) ↔ (∃ m < n, P m) ∨ P n := by
+  constructor
+  · rintro ⟨m, hm, hP⟩
+    rcases Nat.lt_succ_iff_lt_or_eq.mp hm with hmn | rfl
+    · exact Or.inl ⟨m, hmn, hP⟩
+    · exact Or.inr hP
+  · rintro (h | hP)
+    · rcases h with ⟨m, hm, hP⟩
+      exact ⟨m, Nat.lt_succ_of_lt hm, hP⟩
+    · exact ⟨n, Nat.lt_succ_self n, hP⟩
+
+end Nat
+
 attribute [game_cmp] le_rfl
   zero_add add_zero zero_mul mul_zero one_mul mul_one neg_zero sub_eq_add_neg
   Nat.cast_zero Nat.cast_one Nat.forall_lt_succ Nat.exists_lt_succ
